@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  hikari:
+    image: j3br/hikari:latest
+    container_name: hikari
+    environment:
+      - ILO_URL=https://CHANGEME
+      - ILO_USER=CHANGEME
+      - ILO_PASS=CHANGEME
+      - ILO_VERIFY_SSL=False
+      - DISCORD_TOKEN=CHANGEME
+      - CHANNEL_ID=CHANGEME
+    restart: unless-stopped
