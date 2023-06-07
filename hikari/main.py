@@ -44,7 +44,6 @@ def main():
         elif message.content.lower() == "!stop":
             result = ilo_client.actions.power.off
             await message.channel.send(result)
-            return
 
     client.run(settings.discord.token)
 
