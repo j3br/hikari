@@ -26,7 +26,11 @@ def main():
     settings = load_settings_from_env()
 
     # Initialize ILO API client
-    ilo_client = APIClient(base_url=settings.ilo.base_url, auth=settings.ilo.auth)
+    ilo_client = APIClient(
+        base_url=settings.ilo.base_url,
+        auth=settings.ilo.auth,
+        verify_ssl=settings.ilo.verify_ssl,
+    )
 
     # Set up Discord client
     intents = discord.Intents.default()
