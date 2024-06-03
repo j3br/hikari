@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   hikari:
     image: j3br/hikari:latest
