@@ -1,14 +1,29 @@
 import discord
 import logging
+import sys
 from hikari.ilo.client import APIClient
-from hikari.config import Settings
+from hikari.utils import check_env_vars, load_settings_from_env
 
-settings = Settings()
+
+REQUIRED_ENVIRONMENT_VARS = [
+    "ILO_URL",
+    "ILO_USER",
+    "ILO_PASS",
+    "DISCORD_TOKEN",
+    "CHANNEL_ID",
+]
+
+# Set up logging
+logger = logging.getLogger("discord")
+
 
 def main():
 
-    # Set up logging
-    logger = logging.getLogger("discord")
+    # Verify that the required environment variables are set
+    if not check_env_vars(REQUIRED_ENVIRONMENT_VARS):
+        sys.exit(1)
+
+    settings = load_settings_from_env()
 
     # Initialize ILO API client
     ilo_client = APIClient(base_url=settings.ilo.base_url, auth=settings.ilo.auth)
@@ -25,7 +40,10 @@ def main():
 
     @client.event
     async def on_message(message):
-        if message.author == client.user or str(message.channel.id) != settings.discord.channel_id:
+        if (
+            message.author == client.user
+            or str(message.channel.id) != settings.discord.channel_id
+        ):
             return
 
         if message.content.lower() == "!status":
@@ -47,5 +65,6 @@ def main():
 
     client.run(settings.discord.token)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
