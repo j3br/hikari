@@ -17,22 +17,7 @@ REQUIRED_ENVIRONMENT_VARS = [
 logger = logging.getLogger("discord")
 
 
-def main():
-
-    # Verify that the required environment variables are set
-    if not check_env_vars(REQUIRED_ENVIRONMENT_VARS):
-        sys.exit(1)
-
-    settings = load_settings_from_env()
-
-    # Initialize ILO API client
-    ilo_client = APIClient(
-        base_url=settings.ilo.base_url,
-        auth=settings.ilo.auth,
-        verify_ssl=settings.ilo.verify_ssl,
-    )
-
-    # Set up Discord client
+def create_discord_client(settings, ilo_client) -> discord.Client:
     intents = discord.Intents.default()
     intents.message_content = True
 
@@ -40,7 +25,7 @@ def main():
 
     @client.event
     async def on_ready():
-        logger.info("Connected as %s", client.user)
+        print(f"Connected as {client.user}")
 
     @client.event
     async def on_message(message):
@@ -67,7 +52,28 @@ def main():
             result = ilo_client.actions.power.off
             await message.channel.send(result)
 
-    client.run(settings.discord.token)
+    return client
+
+
+def main():
+
+    # Verify that the required environment variables are set
+    if not check_env_vars(REQUIRED_ENVIRONMENT_VARS):
+        sys.exit(1)
+
+    # Load settings from environment variables
+    settings = load_settings_from_env()
+
+    # Initialize ILO API client
+    ilo_client = APIClient(
+        base_url=settings.ilo.base_url,
+        auth=settings.ilo.auth,
+        verify_ssl=settings.ilo.verify_ssl,
+    )
+
+    # Set up Discord client
+    discord_client = create_discord_client(settings, ilo_client)
+    discord_client.run(settings.discord.token)
 
 
 if __name__ == "__main__":
