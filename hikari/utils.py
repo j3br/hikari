@@ -40,17 +40,27 @@ def check_env_vars(required_env_vars: list) -> bool:
         return False
 
 
+def get_env_var(name: str, default: str = "") -> str:
+    return os.getenv(name, default)
+
+
+def get_bool_env_var(name: str, default: str = "False") -> bool:
+    return os.getenv(name, default).lower() in ["true", "1", "yes"]
+
+
 def load_settings_from_env() -> Settings:
-    ilo_auth = ILOAuth(username=os.getenv("ILO_USER"), password=os.getenv("ILO_PASS"))
+    ilo_auth = ILOAuth(
+        username=get_env_var("ILO_USER"), password=get_env_var("ILO_PASS")
+    )
 
     ilo_settings = ILOSettings(
         auth=ilo_auth,
-        base_url=os.getenv("ILO_URL"),
-        verify_ssl=os.getenv("ILO_VERIFY_SSL", "False") == "True",
+        base_url=get_env_var("ILO_URL"),
+        verify_ssl=get_bool_env_var("ILO_VERIFY_SSL", "False"),
     )
 
     discord_settings = DiscordSettings(
-        token=os.getenv("DISCORD_TOKEN"), channel_id=os.getenv("CHANNEL_ID")
+        token=get_env_var("DISCORD_TOKEN"), channel_id=get_env_var("CHANNEL_ID")
     )
 
     return Settings(ilo=ilo_settings, discord=discord_settings)
